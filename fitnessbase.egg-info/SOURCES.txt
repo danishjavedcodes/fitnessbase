@@ -1,0 +1,7 @@
+pyproject.toml
+fitnessbase/__init__.py
+fitnessbase.egg-info/PKG-INFO
+fitnessbase.egg-info/SOURCES.txt
+fitnessbase.egg-info/dependency_links.txt
+fitnessbase.egg-info/requires.txt
+fitnessbase.egg-info/top_level.txt
