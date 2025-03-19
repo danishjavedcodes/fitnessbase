@@ -1,1 +1,1 @@
-﻿web: gunicorn 'fitnessbase:create_app()'
+﻿web: gunicorn "fitnessbase:create_app()"
