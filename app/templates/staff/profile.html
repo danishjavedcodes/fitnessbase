@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold mb-6">Staff Profile</h2>
+        
+        <div class="space-y-4">
+            <div class="flex justify-between">
+                <span class="font-semibold">Full Name:</span>
+                <span>{{ current_user.full_name }}</span>
+            </div>
+            
+            <div class="flex justify-between">
+                <span class="font-semibold">Staff Type:</span>
+                <span>{{ current_user.staff_type }}</span>
+            </div>
+            
+            <div class="flex justify-between">
+                <span class="font-semibold">Date of Birth:</span>
+                <span>{{ current_user.dob.strftime('%Y-%m-%d') }}</span>
+            </div>
+            
+            <div class="flex justify-between">
+                <span class="font-semibold">Phone Number:</span>
+                <span>{{ current_user.phone_number }}</span>
+            </div>
+            
+            <div class="flex justify-between">
+                <span class="font-semibold">Gender:</span>
+                <span>{{ current_user.gender }}</span>
+            </div>
+            
+            <div class="flex justify-between">
+                <span class="font-semibold">Address:</span>
+                <span>{{ current_user.address }}</span>
+            </div>
+            
+            <div class="flex justify-between">
+                <span class="font-semibold">Next of Kin:</span>
+                <span>{{ current_user.next_of_kin_name }}</span>
+            </div>
+            
+            <div class="flex justify-between">
+                <span class="font-semibold">Next of Kin Phone:</span>
+                <span>{{ current_user.next_of_kin_phone_number }}</span>
+            </div>
+            
+            <div class="flex justify-between">
+                <span class="font-semibold">Username:</span>
+                <span>{{ current_user.username }}</span>
+            </div>
+        </div>
+        
+        <div class="mt-6">
+            <a href="{{ url_for('staff.edit_profile') }}" class="btn-primary">
+                Edit Profile
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

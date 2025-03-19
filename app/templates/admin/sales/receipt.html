@@ -1,0 +1,68 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="receipt-container" id="receipt">
+    <div class="text-center mb-4">
+        <h2>GYM NAME</h2>
+        <p>Receipt #{{ receipt.sale_id }}</p>
+        <p>Date: {{ receipt.date }}</p>
+        <p>Staff: {{ receipt.staff }}</p>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in receipt.items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ "%.2f"|format(item.unit_price) }}</td>
+                <td>${{ "%.2f"|format(item.total) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                <td><strong>${{ "%.2f"|format(receipt.total) }}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="text-center mt-4">
+        <p>Payment Method: {{ receipt.payment_method }}</p>
+        <p>Thank you for your business!</p>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <button onclick="window.print()" class="btn btn-primary">Print Receipt</button>
+    <a href="{{ url_for('admin.sales') }}" class="btn btn-secondary">Back to Sales</a>
+</div>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #receipt, #receipt * {
+            visibility: visible;
+        }
+        #receipt {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        .btn {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}

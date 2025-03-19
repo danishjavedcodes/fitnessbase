@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Add Package - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-8 px-4">
+    <div class="space-y-8">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-semibold text-gray-900">Add New Package</h1>
+            <a href="{{ url_for('admin.packages') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to Packages
+            </a>
+        </div>
+
+        <form method="POST" class="space-y-6">
+            <div class="space-y-4">
+                <div>
+                    <label for="package_name" class="block text-sm font-medium text-gray-700">Package Name</label>
+                    <input type="text" name="package_name" id="package_name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">$</span>
+                        </div>
+                        <input type="number" name="price" id="price" step="0.01" required class="pl-7 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="duration_in_months" class="block text-sm font-medium text-gray-700">Duration (months)</label>
+                    <input type="number" name="duration_in_months" id="duration_in_months" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label for="trainer_option" class="block text-sm font-medium text-gray-700">Trainer Option</label>
+                    <select name="trainer_option" id="trainer_option" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="personal">Personal Trainer</option>
+                        <option value="group">Group Training</option>
+                        <option value="none">No Trainer</option>
+                    </select>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <input type="checkbox" name="cardio_access" id="cardio_access" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <label for="cardio_access" class="ml-2 block text-sm text-gray-700">Cardio Access</label>
+                    </div>
+
+                    <div>
+                        <label for="sauna_access" class="block text-sm font-medium text-gray-700">Sauna Access (visits per month)</label>
+                        <input type="number" name="sauna_access" id="sauna_access" min="0" value="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label for="steam_room_access" class="block text-sm font-medium text-gray-700">Steam Room Access (visits per month)</label>
+                        <input type="number" name="steam_room_access" id="steam_room_access" min="0" value="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="timings" class="block text-sm font-medium text-gray-700">Timings</label>
+                    <select name="timings" id="timings" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="morning">Morning</option>
+                        <option value="evening">Evening</option>
+                        <option value="full day">Full Day</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-save mr-2"></i>
+                    Save Package
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

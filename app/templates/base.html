@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gym Management System{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    {% if current_user.is_authenticated %}
+    <nav class="bg-gray-800 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-xl font-bold">Fitness Base</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            {% if 'admin' in current_user.privileges %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Dashboard</a>
+                            <a href="{{ url_for('admin.members') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Members</a>
+                            <a href="{{ url_for('admin.membership') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Membership</a>
+                            <a href="{{ url_for('admin.attendance') }}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Members Attendance </a>
+                            <a href="{{ url_for('admin.packages') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Packages</a>
+                            <a> | </a>
+                            <a href="{{ url_for('admin.staff') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Staff</a>
+                            <a href="{{ url_for('admin.staff_attendance') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Staff Attendance</a>
+                            <a> | </a>
+                            <a href="{{ url_for('admin.inventory') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Inventory</a>
+                            <a href="{{ url_for('admin.sales') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Sales</a>
+                            {% else %}
+                            <a href="{{ url_for('staff.dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Dashboard</a>
+                            {% if current_user.has_privilege('view_members') %}
+                            <a href="{{ url_for('staff.members') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Members</a>
+                            {% endif %}
+                            {% if current_user.has_privilege('view_membership') %}
+                            <a href="{{ url_for('staff.membership') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Membership</a>
+                            {% endif %}
+                            {% if current_user.has_privilege('view_inventory') %}
+                            <a href="{{ url_for('staff.inventory') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Inventory</a>
+                            {% endif %}
+                            {% if current_user.has_privilege('view_sales') %}
+                            <a href="{{ url_for('staff.sales') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Sales</a>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <div class="ml-3 relative">
+                            <div class="flex items-center space-x-4">
+                                <span>{{ current_user.full_name }}</span>
+                                <a href="{{ url_for('auth.logout') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">
+                <p>{{ message }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

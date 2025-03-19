@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Membership Statistics</h2>
+    
+    <!-- Membership Summary Table -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Current Month Summary</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h3 class="card-title text-primary">{{ membership_summary.total_members }}</h3>
+                            <p class="card-text">Total Members</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h3 class="card-title text-success">{{ membership_summary.paid_this_month }}</h3>
+                            <p class="card-text">Active Members</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h3 class="card-title text-danger">{{ membership_summary.not_paid_this_month }}</h3>
+                            <p class="card-text">Inactive Members</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Members List Table -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Members List</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in members %}
+                        <tr>
+                            <td>{{ member.member_id }}</td>
+                            <td>{{ member.full_name }}</td>
+                            <td>{{ member.phone_number }}</td>
+                            <td>
+                                <span class="badge {% if member.membership_status == 'active' %}badge-success{% elif member.membership_status == 'expired' %}badge-danger{% else %}badge-warning{% endif %}">
+                                    {{ member.membership_status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin.edit_member', member_id=member.member_id) }}" class="btn btn-sm btn-primary">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

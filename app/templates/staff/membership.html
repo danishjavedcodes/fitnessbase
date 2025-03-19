@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Membership Management{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Membership Management</h1>
+    
+    {% if current_user.has_privilege('sell_packages') %}
+    <!-- Package Purchase Form -->
+    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-8">
+        <h2 class="text-2xl font-semibold mb-6">Purchase Package</h2>
+        <form method="POST" action="{{ url_for('staff.purchase_package') }}" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="member_id">
+                        Member
+                    </label>
+                    <select name="member_id" id="member_id" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">Select Member</option>
+                        {% for member in members %}
+                        <option value="{{ member.member_id }}">{{ member.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="package_id">
+                        Package
+                    </label>
+                    <select name="package_id" id="package_id" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">Select Package</option>
+                        {% for package in packages %}
+                        <option value="{{ package.package_id }}">{{ package.package_name }} - ${{ package.price }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Purchase Package
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Package Sales History -->
+    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8">
+        <h2 class="text-2xl font-semibold mb-6">Package Sales History</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full table-auto">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">Sale ID</th>
+                        <th class="py-3 px-6 text-left">Package</th>
+                        <th class="py-3 px-6 text-left">Member</th>
+                        <th class="py-3 px-6 text-left">Purchase Date</th>
+                        <th class="py-3 px-6 text-left">Expiry Date</th>
+                        <th class="py-3 px-6 text-left">Staff</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600 text-sm font-light">
+                    {% for sale in package_sales %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6 text-left">{{ sale.sale_id }}</td>
+                        <td class="py-3 px-6 text-left">{{ sale.package_name }}</td>
+                        <td class="py-3 px-6 text-left">{{ sale.buyer_full_name }}</td>
+                        <td class="py-3 px-6 text-left">{{ sale.purchase_date }}</td>
+                        <td class="py-3 px-6 text-left">{{ sale.expiry_date }}</td>
+                        <td class="py-3 px-6 text-left">{{ sale.receiver_full_name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

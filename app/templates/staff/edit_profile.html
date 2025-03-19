@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold mb-6">Edit Profile</h2>
+        
+        <form method="POST">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="full_name">
+                    Full Name
+                </label>
+                <input type="text" name="full_name" id="full_name" 
+                       value="{{ current_user.full_name }}"
+                       class="form-input w-full" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="phone_number">
+                    Phone Number
+                </label>
+                <input type="tel" name="phone_number" id="phone_number" 
+                       value="{{ current_user.phone_number }}"
+                       class="form-input w-full">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="address">
+                    Address
+                </label>
+                <textarea name="address" id="address" 
+                          class="form-textarea w-full" rows="3">{{ current_user.address }}</textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="next_of_kin_name">
+                    Next of Kin Name
+                </label>
+                <input type="text" name="next_of_kin_name" id="next_of_kin_name" 
+                       value="{{ current_user.next_of_kin_name }}"
+                       class="form-input w-full">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="next_of_kin_phone_number">
+                    Next of Kin Phone Number
+                </label>
+                <input type="tel" name="next_of_kin_phone_number" id="next_of_kin_phone_number" 
+                       value="{{ current_user.next_of_kin_phone_number }}"
+                       class="form-input w-full">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                    New Password (leave blank to keep current)
+                </label>
+                <input type="password" name="password" id="password" 
+                       class="form-input w-full">
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <button type="submit" class="btn-primary">
+                    Update Profile
+                </button>
+                <a href="{{ url_for('staff.profile') }}" class="btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

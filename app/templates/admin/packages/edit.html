@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Package - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-semibold text-gray-900">Edit Package</h1>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <form method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    <label for="package_name" class="block text-sm font-medium text-gray-700">Package Name</label>
+                    <input type="text" name="package_name" id="package_name" value="{{ package.package_name }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+                    <input type="number" step="0.01" name="price" id="price" value="{{ package.price }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label for="duration_in_months" class="block text-sm font-medium text-gray-700">Duration (months)</label>
+                    <input type="number" name="duration_in_months" id="duration_in_months" value="{{ package.duration_in_months }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label for="trainer_option" class="block text-sm font-medium text-gray-700">Trainer Option</label>
+                    <select name="trainer_option" id="trainer_option" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="personal" {% if package.trainer_option == 'personal' %}selected{% endif %}>Personal</option>
+                        <option value="group" {% if package.trainer_option == 'group' %}selected{% endif %}>Group</option>
+                        <option value="none" {% if package.trainer_option == 'none' %}selected{% endif %}>None</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="timings" class="block text-sm font-medium text-gray-700">Timings</label>
+                    <select name="timings" id="timings" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="morning" {% if package.timings == 'morning' %}selected{% endif %}>Morning</option>
+                        <option value="evening" {% if package.timings == 'evening' %}selected{% endif %}>Evening</option>
+                        <option value="full day" {% if package.timings == 'full day' %}selected{% endif %}>Full Day</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <input type="checkbox" name="cardio_access" id="cardio_access" {% if package.cardio_access %}checked{% endif %} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="cardio_access" class="ml-2 block text-sm text-gray-900">Cardio Access</label>
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" name="sauna_access" id="sauna_access" {% if package.sauna_access %}checked{% endif %} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="sauna_access" class="ml-2 block text-sm text-gray-900">Sauna Access</label>
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" name="steam_room_access" id="steam_room_access" {% if package.steam_room_access %}checked{% endif %} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="steam_room_access" class="ml-2 block text-sm text-gray-900">Steam Room Access</label>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <a href="{{ url_for('admin.packages') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Cancel</a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

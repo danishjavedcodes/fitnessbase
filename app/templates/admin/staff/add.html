@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold mb-6">Add New Staff Member</h2>
+        
+        <form method="POST">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="full_name">
+                    Full Name
+                </label>
+                <input type="text" name="full_name" id="full_name" class="form-input w-full" required>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="staff_type">
+                    Staff Type
+                </label>
+                <select name="staff_type" id="staff_type" class="form-select w-full" required>
+                    <option value="receptionist">Receptionist</option>
+                    <option value="trainer">Trainer</option>
+                    <option value="cleaner">Cleaner</option>
+                    <option value="manager">Manager</option>
+                    <option value="others">Others</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="dob">
+                    Date of Birth
+                </label>
+                <input type="date" name="dob" id="dob" class="form-input w-full" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="phone_number">
+                    Phone Number
+                </label>
+                <input type="tel" name="phone_number" id="phone_number" class="form-input w-full">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="address">
+                    Address
+                </label>
+                <textarea name="address" id="address" class="form-textarea w-full" rows="3"></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="gender">
+                    Gender
+                </label>
+                <select name="gender" id="gender" class="form-select w-full" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="next_of_kin_name">
+                    Next of Kin Name
+                </label>
+                <input type="text" name="next_of_kin_name" id="next_of_kin_name" class="form-input w-full">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="next_of_kin_phone_number">
+                    Next of Kin Phone Number
+                </label>
+                <input type="tel" name="next_of_kin_phone_number" id="next_of_kin_phone_number" class="form-input w-full">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="salary">
+                    Salary
+                </label>
+                <input type="number" step="0.01" name="salary" id="salary" class="form-input w-full" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+                    Username
+                </label>
+                <input type="text" name="username" id="username" class="form-input w-full" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                    Password
+                </label>
+                <input type="password" name="password" id="password" class="form-input w-full" required>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-3">Access Privileges</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="privileges" value="dashboard" class="form-checkbox">
+                        <span>Dashboard Access</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="privileges" value="members" class="form-checkbox">
+                        <span>Members Management</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="privileges" value="membership" class="form-checkbox">
+                        <span>Membership Management</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="privileges" value="attendance" class="form-checkbox">
+                        <span>Member Attendance</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="privileges" value="packages" class="form-checkbox">
+                        <span>Packages Management</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="privileges" value="staff" class="form-checkbox">
+                        <span>Staff Management</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="privileges" value="staff_attendance" class="form-checkbox">
+                        <span>Staff Attendance</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="privileges" value="inventory" class="form-checkbox">
+                        <span>Inventory Management</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="privileges" value="sales" class="form-checkbox">
+                        <span>Sales Management</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <button type="submit" class="btn-primary">
+                    Add Staff
+                </button>
+                <a href="{{ url_for('admin.staff') }}" class="btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <!-- Header and Controls -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
+            <h2 class="text-2xl font-bold text-gray-800">Staff Attendance</h2>
+            
+            <!-- Attendance Controls -->
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                <select id="staffSelect" class="form-select rounded-md border-gray-300 shadow-sm">
+                    <option value="">Select Staff Member</option>
+                    {% for staff in staff_list %}
+                    <option value="{{ staff.staff_id }}">{{ staff.full_name }}</option>
+                    {% endfor %}
+                </select>
+                <div class="flex space-x-2">
+                    <button id="checkInBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition duration-200 flex items-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Check In
+                    </button>
+                    <button id="checkOutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-200 flex items-center">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Check Out
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertMessage" class="hidden mb-4"></div>
+
+        <!-- Attendance Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Staff Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check In (PKT)</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check Out (PKT)</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marked By</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for record in attendance_records %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">{{ record.staff_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {{ (record.check_in_time + timedelta(hours=5)).strftime('%Y-%m-%d %I:%M %p') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if record.check_out_time %}
+                                {{ (record.check_out_time + timedelta(hours=5)).strftime('%Y-%m-%d %I:%M %p') }}
+                            {% else %}
+                                <span class="text-yellow-500">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if record.check_out_time %}
+                                {% set duration = (record.check_out_time - record.check_in_time) %}
+                                {% set hours = ((duration.total_seconds() // 3600)|int) %}
+                                {% set minutes = (((duration.total_seconds() % 3600) // 60)|int) %}
+                                {{ '{:02d}:{:02d}'.format(hours, minutes) }}
+                            {% else %}
+                                <span class="text-yellow-500">Active</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ record.marked_by_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if not record.check_out_time %}
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                    Active
+                                </span>
+                            {% else %}
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                    Completed
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const staffSelect = document.getElementById('staffSelect');
+    const checkInBtn = document.getElementById('checkInBtn');
+    const checkOutBtn = document.getElementById('checkOutBtn');
+    const alertMessage = document.getElementById('alertMessage');
+
+    function showAlert(message, type) {
+        alertMessage.className = `mb-4 p-4 rounded-md ${type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+        alertMessage.textContent = message;
+        alertMessage.classList.remove('hidden');
+        setTimeout(() => alertMessage.classList.add('hidden'), 3000);
+    }
+
+    async function markAttendance(action) {
+        const staffId = staffSelect.value;
+        if (!staffId) {
+            showAlert('Please select a staff member', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch("{{ url_for('admin.mark_staff_attendance') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    staff_id: staffId,
+                    action: action
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                showAlert(`Successfully marked ${action}`, 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showAlert(data.error || 'Failed to mark attendance', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('Error marking attendance', 'error');
+        }
+    }
+
+    checkInBtn.addEventListener('click', () => markAttendance('check_in'));
+    checkOutBtn.addEventListener('click', () => markAttendance('check_out'));
+});
+</script>
+{% endblock %}

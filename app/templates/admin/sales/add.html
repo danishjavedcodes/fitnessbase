@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">Add New Sale</h2>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <form id="saleForm" class="space-y-6">
+            <div id="itemsList" class="space-y-4">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700">Item Type</label>
+                        <select name="item_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            <option value="product">Product</option>
+                            <option value="inventory">Inventory Item</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700">Item</label>
+                        <select name="item_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            <optgroup label="Products">
+                                {% for product in products %}
+                                <option value="product_{{ product.product_id }}">{{ product.product_name }} - ${{ "%.2f"|format(product.price) }}</option>
+                                {% endfor %}
+                            </optgroup>
+                            <optgroup label="Inventory Items">
+                                {% for item in items %}
+                                <option value="item_{{ item.item_id }}">{{ item.item_name }} - ${{ "%.2f"|format(item.cost_per_serving) }}/serving</option>
+                                {% endfor %}
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="w-24">
+                        <label class="block text-sm font-medium text-gray-700">Quantity</label>
+                        <input type="number" name="quantity" min="1" value="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" class="remove-item px-3 py-2 text-red-600 hover:text-red-800">Remove</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <button type="button" id="addItem" class="btn-secondary">Add Another Item</button>
+                <div class="text-right">
+                    <div class="text-lg font-semibold">Total: $<span id="totalAmount">0.00</span></div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Payment Method</label>
+                    <select name="payment_method" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="transfer">Bank Transfer</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <a href="{{ url_for('admin.sales') }}" class="btn-secondary">Cancel</a>
+                <button type="submit" class="btn-primary">Complete Sale</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add this modal for receipt -->
+<div id="receiptModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+    <div class="bg-white p-6 rounded-lg shadow-xl max-w-lg mx-auto mt-20">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold">Sale Receipt</h3>
+            <button onclick="closeReceiptModal()" class="text-gray-500 hover:text-gray-700">
+                <span class="text-2xl">&times;</span>
+            </button>
+        </div>
+        <div id="receiptContent" class="mb-4">
+            <!-- Receipt content will be inserted here -->
+        </div>
+        <div class="flex justify-between">
+            <button onclick="printReceipt()" class="btn-primary">
+                Print Receipt
+            </button>
+            <button onclick="downloadPDF()" class="btn-secondary">
+                Save as PDF
+            </button>
+            <button onclick="closeReceiptModal()" class="btn-secondary">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add this to your existing JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function clearSaleForm() {
+    // Keep only one item row
+    const itemsList = document.getElementById('itemsList');
+    const firstItem = itemsList.querySelector('div').cloneNode(true);
+    itemsList.innerHTML = '';
+    itemsList.appendChild(firstItem);
+    
+    // Reset values
+    firstItem.querySelector('[name="quantity"]').value = 1;
+    firstItem.querySelector('[name="item_id"]').selectedIndex = 0;
+    firstItem.querySelector('[name="item_type"]').selectedIndex = 0;
+    
+    // Reset payment method
+    document.querySelector('[name="payment_method"]').selectedIndex = 0;
+    
+    // Reset total
+    updateTotal();
+}
+
+function handleSaleSuccess(response) {
+    if (response.success) {
+        document.getElementById('receiptContent').innerHTML = response.receipt;
+        document.getElementById('receiptModal').classList.remove('hidden');
+        currentSaleId = response.sale_id;
+        clearSaleForm();
+    } else {
+        alert('Error processing sale: ' + response.message);
+    }
+}
+
+function closeReceiptModal() {
+    document.getElementById('receiptModal').classList.add('hidden');
+}
+
+function printReceipt() {
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Receipt</title>
+                <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+            </head>
+            <body class="p-4">
+                ${document.getElementById('receiptContent').innerHTML}
+            </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function downloadPDF() {
+    const element = document.getElementById('receiptContent');
+    const opt = {
+        margin: 1,
+        filename: `receipt-${currentSaleId}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+
+let itemPrices = {
+    {% for product in products %}
+    'product_{{ product.product_id }}': {{ product.price }},
+    {% endfor %}
+    {% for item in items %}
+    'item_{{ item.item_id }}': {{ item.cost_per_serving }},
+    {% endfor %}
+};
+
+function updateTotal() {
+    let total = 0;
+    const itemDivs = document.querySelectorAll('#itemsList > div');
+    
+    itemDivs.forEach(div => {
+        const itemId = div.querySelector('[name="item_id"]').value;
+        const quantity = parseInt(div.querySelector('[name="quantity"]').value) || 0;
+        const price = itemPrices[itemId] || 0;
+        total += price * quantity;
+    });
+    
+    document.getElementById('totalAmount').textContent = total.toFixed(2);
+    return total;
+}
+
+// Add event listeners for quantity changes
+document.getElementById('itemsList').addEventListener('change', function(e) {
+    if (e.target.matches('[name="quantity"]') || e.target.matches('[name="item_id"]')) {
+        updateTotal();
+    }
+});
+
+// Update the form submission handling
+document.getElementById('saleForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const items = [];
+    const itemDivs = document.querySelectorAll('#itemsList > div');
+    
+    itemDivs.forEach(div => {
+        const itemSelect = div.querySelector('[name="item_id"]');
+        const [type, id] = itemSelect.value.split('_');
+        const quantity = parseInt(div.querySelector('[name="quantity"]').value);
+        const price = itemPrices[itemSelect.value];
+        
+        items.push({
+            item_type: type,
+            item_id: id,
+            quantity: quantity,
+            unit_price: price
+        });
+    });
+    
+    const saleData = {
+        items: items,
+        payment_method: document.querySelector('[name="payment_method"]').value
+    };
+    
+    try {
+        const response = await fetch('/admin/sales/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(saleData)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            handleSaleSuccess(result);
+            // Remove the immediate redirect
+            // Let user view/print receipt first
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Error submitting sale: ' + error);
+    }
+});
+
+// Update the closeReceiptModal function
+function closeReceiptModal() {
+    document.getElementById('receiptModal').classList.add('hidden');
+    // Redirect after closing the receipt
+    window.location.href = '/admin/sales';
+}
+
+// Add this to initialize total on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateTotal();
+});
+
+// Update the addItem function to include price calculation
+document.getElementById('addItem').addEventListener('click', function() {
+    const newItem = document.querySelector('#itemsList > div').cloneNode(true);
+    // Reset values
+    newItem.querySelector('[name="quantity"]').value = 1;
+    document.getElementById('itemsList').appendChild(newItem);
+    updateTotal();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
+    
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+                        <i class="fas fa-users text-white"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Members</dt>
+                            <dd class="text-lg font-semibold text-gray-900">{{ total_members }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                        <i class="fas fa-user-tie text-white"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Staff</dt>
+                            <dd class="text-lg font-semibold text-gray-900">{{ total_staff }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+                        <i class="fas fa-box text-white"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Packages</dt>
+                            <dd class="text-lg font-semibold text-gray-900">{{ total_packages }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                        <i class="fas fa-clock text-white"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Today's Attendance</dt>
+                            <dd class="text-lg font-semibold text-gray-900">{{ today_attendance }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="bg-white shadow rounded-lg p-4 h-[300px]">
+            <!-- <h2 class="text-lg font-semibold mb-4">Membership Status for current Month</h2> -->
+            <div class="h-full w-full flex items-center justify-center">
+                <canvas id="membershipChart"></canvas>
+            </div>
+        </div>
+        <div class="bg-white shadow rounded-lg p-4 h-[300px]">
+            <!-- <h2 class="text-lg font-semibold mb-4">Attendance Trend</h2> -->
+            <div class="h-full w-full flex items-center justify-center">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+        </div>
+        <div class="bg-white shadow rounded-lg p-4 h-[300px]">
+            <!-- <h2 class="text-lg font-semibold mb-4">Sales Trend</h2> -->
+            <div class="h-full w-full flex items-center justify-center">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Sales -->
+    <div class="bg-white shadow rounded-lg p-4">
+        <h2 class="text-lg font-semibold mb-4">Recent Sales</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sale ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for sale in recent_sales %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#{{ sale.sale_id }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ "%.2f"|format(sale.total_amount|float) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ sale.payment_method }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ sale.sale_timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Membership Status Donut Chart
+    const membershipCtx = document.getElementById('membershipChart').getContext('2d');
+    new Chart(membershipCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Paid', 'Not Paid'],
+            datasets: [{
+                data: [{{ membership_summary.paid_this_month }}, {{ membership_summary.not_paid_this_month }}],
+                backgroundColor: [
+                    'rgba(52, 211, 153, 0.7)',  // Light green
+                    'rgba(248, 113, 113, 0.7)'  // Light red
+                ],
+                borderColor: [
+                    'rgba(52, 211, 153, 1)',
+                    'rgba(248, 113, 113, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        },
+        plugins: [{
+            id: 'centerStats',
+            afterDraw(chart) {
+                const {ctx, width, height} = chart;
+                ctx.save();
+                
+                const total = {{ membership_summary.paid_this_month + membership_summary.not_paid_this_month }};
+                const paid = {{ membership_summary.paid_this_month }};
+                const notPaid = {{ membership_summary.not_paid_this_month }};
+                const paidPercentage = Math.round((paid / total) * 100);
+                
+                // Center point
+                const centerX = width / 2;
+                const centerY = height / 2;
+                
+                // Draw percentage
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = 'bold 24px Arial';
+                ctx.fillStyle = '#374151';
+                ctx.fillText(`${paidPercentage}%`, centerX, centerY - 20);
+                
+                // Draw "Members Paid" text
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#6B7280';
+                ctx.fillText('Members Paid fees', centerX, centerY + 5);
+                
+                // Draw stats
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'left';
+                
+                // Paid stats
+                const statsY = centerY + 25;
+                ctx.fillStyle = 'rgba(52, 211, 153, 0.7)';
+                ctx.fillRect(centerX - 50, statsY, 8, 8);
+                ctx.fillStyle = '#374151';
+                ctx.fillText(`Paid: ${paid}`, centerX - 38, statsY + 6);
+                
+                // Not Paid stats
+                ctx.fillStyle = 'rgba(248, 113, 113, 0.7)';
+                ctx.fillRect(centerX - 50, statsY + 15, 8, 8);
+                ctx.fillStyle = '#374151';
+                ctx.fillText(`Not Paid: ${notPaid}`, centerX - 38, statsY + 21);
+                
+                ctx.restore();
+            }
+        }]
+    });
+
+    // Fetch and render attendance and sales charts
+    fetch('{{ url_for("admin.chart_data") }}')
+        .then(response => response.json())
+        .then(data => {
+            // Attendance Chart
+            const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+            new Chart(attendanceCtx, {
+                type: 'line',
+                data: {
+                    labels: data.attendance.map(item => item.date),
+                    datasets: [{
+                        label: 'Daily Attendance',
+                        data: data.attendance.map(item => item.count),
+                        borderColor: 'rgba(99, 102, 241, 0.7)',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            new Chart(salesCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.sales.map(item => item.date),
+                    datasets: [{
+                        label: 'Daily Sales',
+                        data: data.sales.map(item => item.total),
+                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                        borderColor: 'rgb(59, 130, 246)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+</script>
+{% endblock %}

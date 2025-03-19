@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Items Section -->
+    <div>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Inventory Items</h2>
+            <a href="{{ url_for('admin.add_inventory') }}" class="btn-primary">Add Item</a>
+        </div>
+        <div class="bg-white shadow overflow-x-auto rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Servings</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost/Serving</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remaining</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Other Charges</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Added</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in items %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.item_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.number_of_servings }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ "%.2f"|format(item.cost_per_serving) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.remaining_servings }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ "%.2f"|format(item.other_charges) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.date_added }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{{ url_for('admin.edit_inventory', item_id=item.item_id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                            <form action="{{ url_for('admin.delete_inventory', item_id=item.item_id) }}" method="POST" class="inline">
+                                <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this item?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Products</h2>
+            <a href="{{ url_for('admin.add_product') }}" class="btn-primary">Add Product</a>
+        </div>
+        <div class="bg-white shadow overflow-x-auto rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items Used</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for product in products %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ product.product_name }}</div>
+                            <div class="text-sm text-gray-500">{{ product.description }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${{ "%.2f"|format(product.price) }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900">
+                                {% for item in product.items_used %}
+                                <div>{{ item.display_text }}</div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% set status = product_status|selectattr("product_id", "equalto", product.product_id)|first %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if status.can_be_sold %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ "Available" if status.can_be_sold else "Out of Stock" }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{{ url_for('admin.edit_product', product_id=product.product_id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                            <form action="{{ url_for('admin.delete_product', product_id=product.product_id) }}" method="POST" class="inline">
+                                <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this product?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
