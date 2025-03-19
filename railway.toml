@@ -1,0 +1,10 @@
+[build]
+builder = "nixpacks"
+buildCommand = "echo building!"
+
+[deploy]
+preDeployCommand = ["npm run db:migrate"]
+startCommand = "waitress-serve --port=5000 --call 'fitnessbase:create_app'"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "never"

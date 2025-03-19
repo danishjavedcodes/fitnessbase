@@ -1,7 +1,0 @@
-flask
-flask-sqlalchemy
-flask-login
-python-dotenv
-bcrypt
-psycopg2-binary
-gunicorn
