@@ -10,3 +10,4 @@ Requires-Dist: flask-login
 Requires-Dist: python-dotenv
 Requires-Dist: bcrypt
 Requires-Dist: psycopg2-binary
+Requires-Dist: gunicorn

@@ -15,7 +15,8 @@ dependencies = [
     "flask-login",
     "python-dotenv",
     "bcrypt",
-    "psycopg2-binary"
+    "psycopg2-binary",
+    "gunicorn"  # Add this line
 ]
 requires-python = ">=3.8"
 
