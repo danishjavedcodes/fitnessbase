@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from fitnessbase.config import Config  # Ensure this import is correct
+from ../ import config
 
 db = SQLAlchemy()
 login_manager = LoginManager()
